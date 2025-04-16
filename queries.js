@@ -1,4 +1,4 @@
-const db = require("./connection")
+const db = require("./db/connection")
 
 // db.query(`SELECT * FROM users`)
 // .then((result) => {

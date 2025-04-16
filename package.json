@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
+    "inquirer": "^8.2.6",
     "pg": "^8.13.3",
     "pg-format": "^1.0.4"
   },

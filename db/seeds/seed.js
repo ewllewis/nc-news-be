@@ -102,9 +102,17 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     );
 
     return db.query(insertArticlesQuery)
-   })
-
-  .then(() => {
+  })
+  
+  .then((result) => {
+    const articleLookup = {}
+    result.rows.forEach(article => {
+      articleLookup[article.title] = article.article_id
+    })
+    return articleLookup
+  })
+  
+  .then((articleLookup) => {
     return db.query(`
       CREATE TABLE comments (
         comment_id SERIAL PRIMARY KEY,
@@ -114,14 +122,16 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
         author VARCHAR REFERENCES users(username) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
-      `)
+      `) 
+    .then(() => articleLookup)
   })
 
-  .then(() => {
+  .then((articleLookup) => {
     const formattedComments = commentData.map(comment => {
       const formatted = convertTimestampToDate(comment);
+      const correctArticleId = articleLookup[formatted.article_title]
       return [
-      formatted.article_id,
+      correctArticleId,
       formatted.body,
       formatted.votes,
       formatted.author,
@@ -140,5 +150,5 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     return db.query(insertCommentsQuery)
   })
 
-};
+}
 module.exports = seed;
