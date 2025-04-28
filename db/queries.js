@@ -1,4 +1,4 @@
-const db = require("./db/connection")
+const db = require("./connection");
 
 // db.query(`SELECT * FROM users`)
 // .then((result) => {
@@ -30,8 +30,7 @@ const db = require("./db/connection")
 //     db.end()
 // })
 
-db.query(`SELECT * FROM comments WHERE votes > 10`)
-.then((result) => {
-    console.log(result.rows)
-    db.end()
-})
+db.query(`SELECT * FROM comments WHERE votes > 10`).then((result) => {
+  console.log(result.rows);
+  db.end();
+});

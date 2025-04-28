@@ -150,5 +150,9 @@ const seed = ({ topicData, userData, articleData, commentData }) => {
     return db.query(insertCommentsQuery)
   })
 
+  .then(() => {
+    console.log("Seeding complete")
+  })
+
 }
 module.exports = seed;
