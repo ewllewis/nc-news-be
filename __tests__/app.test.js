@@ -121,3 +121,51 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200; Responds with array of comments from a given article ID", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        //check comments is an array
+        expect(Array.isArray(comments)).toBe(true);
+        //check size of array with known number of comment objects
+        expect(comments).toHaveLength(11);
+
+        for (let i = 0; i > comments.length; i++) {
+          //check each comment object contains the correct properties
+          expect(comments[i]).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+          //check comments are sorted to show most recent comments first
+          const currentComment = comments[i];
+          const nextComment = comments[i + 1];
+          expect(new Date(currentComment.created_at)).toBeGreaterThanOrEqual(
+            new Date(nextComment.created_at)
+          );
+        }
+      });
+  });
+  test("400; Responds 'Invalid article ID format' when article_id is in the wrong format", () => {
+    return request(app)
+      .get("/api/articles/banana/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid article ID format");
+      });
+  });
+  test("404; Responds 'Comments not found' when article_id does not exist in the database", () => {
+    return request(app)
+      .get("/api/articles/100/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Comments not found");
+      });
+  });
+});

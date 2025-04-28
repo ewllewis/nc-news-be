@@ -2,16 +2,12 @@
 const {
   selectArticleById,
   selectArticles,
+  selectCommentsByArticleID,
 } = require("../models/articles.model");
 
 async function getArticleById(req, res, next) {
   const { article_id } = req.params;
   try {
-    //check if article_id is in a valid format
-    if (isNaN(article_id)) {
-      return res.status(400).json({ msg: "Invalid article ID format" });
-    }
-
     const article = await selectArticleById(article_id);
 
     //check if article exists in database
@@ -34,7 +30,24 @@ async function getArticles(req, res, next) {
   }
 }
 
+async function getCommentsByArticleId(req, res, next) {
+  const { article_id } = req.params;
+  try {
+    const comments = await selectCommentsByArticleID(article_id);
+
+    //check if comments exists in database
+    if (comments.length === 0) {
+      return res.status(404).json({ msg: "Comments not found" });
+    }
+
+    res.status(200).send({ comments });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getArticleById,
   getArticles,
+  getCommentsByArticleId,
 };
