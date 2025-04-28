@@ -37,7 +37,7 @@ describe("GET /api/topics", () => {
         expect(topics).toHaveLength(3);
         //check each topic object contains the correct properties
         topics.forEach((topic) => {
-          expect(topics[0]).toMatchObject({
+          expect(topic).toMatchObject({
             description: expect.any(String),
             slug: expect.any(String),
             img_url: expect.any(String),
@@ -82,6 +82,42 @@ describe("GET /api/articles/:article_id", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Article not found");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200; Responds with an array of articles", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        //check articles is an array
+        expect(Array.isArray(articles)).toBe(true);
+        //check size of array with known number of article objects
+        expect(articles).toHaveLength(13);
+
+        for (let i = 0; i > articles.length; i++) {
+          //check each article object contains the correct properties
+          expect(articles[i]).toMatchObject({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+          //check articles are sorted by date in descending order
+          const currentArticle = articles[i];
+          const nextArticle = articles[i + 1];
+          expect(new Date(currentArticle.created_at)).toBeGreaterThanOrEqual(
+            new Date(nextArticle.created_at)
+          );
+          //check body property is not present on any of the articles
+          expect(articles[i]).not.toHaveProperty("body");
+        }
       });
   });
 });
