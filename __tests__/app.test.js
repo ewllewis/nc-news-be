@@ -4,6 +4,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data");
 const app = require("../src/app");
 const request = require("supertest");
+const articles = require("../db/data/test-data/articles");
 
 beforeEach(() => {
   return seed(data);
@@ -42,6 +43,45 @@ describe("GET /api/topics", () => {
             img_url: expect.any(String),
           });
         });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id", () => {
+  test("200; Responds with an article from a given article ID", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body: { article } }) => {
+        //check article ID matches article requested
+        expect(article.article_id).toEqual(1);
+        //check article contains the correct properties
+        expect(article).toMatchObject({
+          author: expect.any(String),
+          title: expect.any(String),
+          article_id: expect.any(Number),
+          body: expect.any(String),
+          topic: expect.any(String),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url: expect.any(String),
+        });
+      });
+  });
+  test("400; Responds 'Invalid article ID format' when article_id is in the wrong format", () => {
+    return request(app)
+      .get("/api/articles/banana")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid article ID format");
+      });
+  });
+  test("404; Responds 'Article not found' when article_id does not exist in the database", () => {
+    return request(app)
+      .get("/api/articles/100")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Article not found");
       });
   });
 });
