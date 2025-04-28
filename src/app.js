@@ -1,6 +1,10 @@
 const express = require("express");
 const app = express();
 
-app.get("/", (req, res) => res.send("Testing this thing!"));
+app.use(express.json());
+
+const apiRouter = require("./routers/api.router");
+
+app.use("/api", apiRouter);
 
 module.exports = app;
