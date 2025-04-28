@@ -1,4 +1,8 @@
-const { selectArticleById } = require("../models/articles.models");
+//articles.model
+const {
+  selectArticleById,
+  selectArticles,
+} = require("../models/articles.model");
 
 async function getArticleById(req, res, next) {
   const { article_id } = req.params;
@@ -21,6 +25,16 @@ async function getArticleById(req, res, next) {
   }
 }
 
+async function getArticles(req, res, next) {
+  try {
+    const articles = await selectArticles();
+    res.status(200).send({ articles });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getArticleById,
+  getArticles,
 };
