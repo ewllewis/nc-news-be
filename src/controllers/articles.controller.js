@@ -4,6 +4,7 @@ const {
   selectArticles,
   selectCommentsByArticleId,
   insertCommentByArticleId,
+  updateVotesOnArticleByArticleId,
 } = require("../models/articles.model");
 
 async function getArticleById(req, res, next) {
@@ -67,9 +68,35 @@ async function postCommentByArticleId(req, res, next) {
   }
 }
 
+async function patchArticleByArticleId(req, res, next) {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+
+  if (!inc_votes || isNaN(inc_votes)) {
+    return res.status(400).send({ msg: "Invalid votes format" });
+  }
+
+  try {
+    const article = await updateVotesOnArticleByArticleId(
+      article_id,
+      inc_votes
+    );
+
+    //check if article exists
+    if (!article) {
+      return res.status(404).send({ msg: "Article not found" });
+    }
+
+    res.status(200).send({ article });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getArticleById,
   getArticles,
   getCommentsByArticleId,
   postCommentByArticleId,
+  patchArticleByArticleId,
 };
