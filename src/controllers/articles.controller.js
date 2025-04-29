@@ -2,7 +2,8 @@
 const {
   selectArticleById,
   selectArticles,
-  selectCommentsByArticleID,
+  selectCommentsByArticleId,
+  insertCommentByArticleId,
 } = require("../models/articles.model");
 
 async function getArticleById(req, res, next) {
@@ -33,7 +34,7 @@ async function getArticles(req, res, next) {
 async function getCommentsByArticleId(req, res, next) {
   const { article_id } = req.params;
   try {
-    const comments = await selectCommentsByArticleID(article_id);
+    const comments = await selectCommentsByArticleId(article_id);
 
     //check if comments exists in database
     if (comments.length === 0) {
@@ -46,8 +47,29 @@ async function getCommentsByArticleId(req, res, next) {
   }
 }
 
+async function postCommentByArticleId(req, res, next) {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+  try {
+    //check if comment body is empty
+    if (body.length === 0) {
+      return res.status(400).json({ msg: "Comment body empty" });
+    }
+
+    const newComment = await insertCommentByArticleId(
+      article_id,
+      username,
+      body
+    );
+    res.status(201).send({ comment: newComment });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getArticleById,
   getArticles,
   getCommentsByArticleId,
+  postCommentByArticleId,
 };

@@ -97,9 +97,9 @@ describe("GET /api/articles", () => {
         //check size of array with known number of article objects
         expect(articles).toHaveLength(13);
 
-        for (let i = 0; i > articles.length; i++) {
+        articles.forEach((article) => {
           //check each article object contains the correct properties
-          expect(articles[i]).toMatchObject({
+          expect(article).toMatchObject({
             author: expect.any(String),
             title: expect.any(String),
             article_id: expect.any(Number),
@@ -107,17 +107,13 @@ describe("GET /api/articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
-            comment_count: expect.any(Number),
+            comment_count: expect.any(String),
           });
-          //check articles are sorted by date in descending order
-          const currentArticle = articles[i];
-          const nextArticle = articles[i + 1];
-          expect(new Date(currentArticle.created_at)).toBeGreaterThanOrEqual(
-            new Date(nextArticle.created_at)
-          );
           //check body property is not present on any of the articles
-          expect(articles[i]).not.toHaveProperty("body");
-        }
+          expect(article).not.toHaveProperty("body");
+        });
+        //check articles are sorted by date in descending order
+        expect(articles).toBeSortedBy(`created_at`, { descending: true });
       });
   });
 });
@@ -133,9 +129,9 @@ describe("GET /api/articles/:article_id/comments", () => {
         //check size of array with known number of comment objects
         expect(comments).toHaveLength(11);
 
-        for (let i = 0; i > comments.length; i++) {
+        comments.forEach((comment) => {
           //check each comment object contains the correct properties
-          expect(comments[i]).toMatchObject({
+          expect(comment).toMatchObject({
             comment_id: expect.any(Number),
             votes: expect.any(Number),
             created_at: expect.any(String),
@@ -143,13 +139,8 @@ describe("GET /api/articles/:article_id/comments", () => {
             body: expect.any(String),
             article_id: expect.any(Number),
           });
-          //check comments are sorted to show most recent comments first
-          const currentComment = comments[i];
-          const nextComment = comments[i + 1];
-          expect(new Date(currentComment.created_at)).toBeGreaterThanOrEqual(
-            new Date(nextComment.created_at)
-          );
-        }
+        });
+        expect(comments).toBeSortedBy(`created_at`, { descending: true });
       });
   });
   test("400; Responds 'Invalid article ID format' when article_id is in the wrong format", () => {
@@ -166,6 +157,77 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(404)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Comments not found");
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201; Responds with posted comment", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "butter_bridge",
+        body: "what does this mean for bananas?",
+      })
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        //check response matches post input data and has correct properties
+        expect(comment).toMatchObject({
+          comment_id: expect.any(Number),
+          article_id: 1,
+          body: "what does this mean for bananas?",
+          votes: expect.any(Number),
+          author: "butter_bridge",
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("400; Responds 'Invalid article ID format' when article_id is in the wrong format", () => {
+    return request(app)
+      .post("/api/articles/banana/comments")
+      .send({
+        username: "butter_bridge",
+        body: "what does this mean for bananas?",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid article ID format");
+      });
+  });
+  test("404; Responds 'User or article not found' when article doesn't exisit in the database", () => {
+    return request(app)
+      .post("/api/articles/100/comments")
+      .send({
+        username: "butter_bridge",
+        body: "what does this mean for bananas?",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("User or article not found");
+      });
+  });
+  test("404; Responds 'User or article not found' when user doesn't exisit in the database", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "banana",
+        body: "what does this mean for bananas?",
+      })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("User or article not found");
+      });
+  });
+  test("400; Responds 'Comment body empty' when body is empty", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "butter_bridge",
+        body: "",
+      })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Comment body empty");
       });
   });
 });

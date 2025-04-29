@@ -36,7 +36,7 @@ async function selectArticles() {
   return rows;
 }
 
-async function selectCommentsByArticleID(articleId) {
+async function selectCommentsByArticleId(articleId) {
   const { rows } = await db.query(
     `SELECT
       comments.comment_id,
@@ -56,8 +56,25 @@ async function selectCommentsByArticleID(articleId) {
   return rows;
 }
 
+async function insertCommentByArticleId(
+  articleId,
+  commentUsername,
+  commentBody
+) {
+  const { rows } = await db.query(
+    `INSERT INTO
+      comments (article_id,author,body)
+    VALUES
+      ($1,$2,$3)
+    RETURNING *`,
+    [articleId, commentUsername, commentBody]
+  );
+  return rows[0];
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
-  selectCommentsByArticleID,
+  selectCommentsByArticleId,
+  insertCommentByArticleId,
 };
