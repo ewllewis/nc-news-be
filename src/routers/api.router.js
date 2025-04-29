@@ -7,11 +7,13 @@ const { getAPIEndpoints } = require("../controllers/api.controller");
 const topicsRouter = require("./topics.router");
 const articlesRouter = require("./articles.router");
 const commentsRouter = require("./comments.router");
+const usersRouter = require("./users.router");
 
 //mount routers
 apiRouter.use("/topics", topicsRouter);
 apiRouter.use("/articles", articlesRouter);
 apiRouter.use("/comments", commentsRouter);
+apiRouter.use("/users", usersRouter);
 
 //get API Endpoints
 apiRouter.get("/", getAPIEndpoints);
