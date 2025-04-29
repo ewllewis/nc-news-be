@@ -16,22 +16,22 @@ async function selectArticleById(articleId) {
 async function selectArticles() {
   const { rows } = await db.query(
     `SELECT
-        articles.author,
-        articles.title,
-        articles.article_id,
-        articles.topic,
-        articles.created_at,
-        articles.votes,
-        articles.article_img_url,
-        COALESCE(COUNT(comments.comment_id), 0) AS comment_count
+      articles.author,
+      articles.title,
+      articles.article_id,
+      articles.topic,
+      articles.created_at,
+      articles.votes,
+      articles.article_img_url,
+      COALESCE(COUNT(comments.comment_id), 0) AS comment_count
     FROM 
-        articles
+      articles
     LEFT JOIN
-        comments ON articles.article_id = comments.article_id
+      comments ON articles.article_id = comments.article_id
     GROUP BY
-        articles.article_id
+      articles.article_id
     ORDER BY
-        articles.created_at DESC`
+      articles.created_at DESC`
   );
   return rows;
 }
@@ -72,9 +72,42 @@ async function insertCommentByArticleId(
   return rows[0];
 }
 
+async function updateVotesOnArticleByArticleId(article_id, inc_votes) {
+  const articleResult = await db.query(
+    `SELECT 
+      * 
+    FROM 
+      articles 
+    WHERE 
+      article_id = $1`,
+    [article_id]
+  );
+
+  //check if the first query returns an article
+  if (!articleResult.rows.length) {
+    return null;
+  }
+
+  const currentVotes = articleResult.rows[0].votes;
+
+  const updatedArticle = await db.query(
+    `UPDATE 
+      articles
+     SET 
+      votes = $1
+     WHERE 
+      article_id = $2
+     RETURNING *`,
+    [currentVotes + inc_votes, article_id]
+  );
+
+  return updatedArticle.rows[0];
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
   selectCommentsByArticleId,
   insertCommentByArticleId,
+  updateVotesOnArticleByArticleId,
 };
