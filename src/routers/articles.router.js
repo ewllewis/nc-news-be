@@ -6,10 +6,14 @@ const {
   getArticleById,
   getArticles,
   getCommentsByArticleId,
+  postCommentByArticleId,
 } = require("../controllers/articles.controller");
 
 //routes
-router.route("/:article_id/comments").get(getCommentsByArticleId);
+router
+  .route("/:article_id/comments")
+  .get(getCommentsByArticleId)
+  .post(postCommentByArticleId);
 router.route("/:article_id").get(getArticleById);
 router.route("/").get(getArticles);
 
