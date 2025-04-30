@@ -3,11 +3,30 @@ const db = require("../../db/connection");
 async function selectArticleById(articleId) {
   const { rows } = await db.query(
     `SELECT 
-            *
+      articles.author,
+      articles.title,
+      articles.article_id,
+      articles.body, 
+      articles.topic,
+      articles.created_at,
+      articles.votes,
+      articles.article_img_url,
+      COALESCE(COUNT(comments.comment_id), 0) AS comment_count
     FROM
-        articles
+      articles
+    LEFT JOIN
+      comments ON articles.article_id = comments.article_id
     WHERE
-        article_id = $1;`,
+      articles.article_id = $1
+    GROUP BY
+      articles.author, 
+      articles.title,
+      articles.article_id,
+      articles.body,
+      articles.topic,
+      articles.created_at,
+      articles.votes,
+      articles.article_img_url;`,
     [articleId]
   );
   return rows[0];
