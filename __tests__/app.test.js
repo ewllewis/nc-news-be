@@ -177,6 +177,21 @@ describe("/api", () => {
             });
         });
       });
+      describe("GET /api/articles/:article_id (comment_count)", () => {
+        test("200; Responds with an article from a given article ID with comment count", () => {
+          return request(app)
+            .get("/api/articles/1")
+            .expect(200)
+            .then(({ body: { article } }) => {
+              //check article ID matches article requested
+              expect(article.article_id).toEqual(1);
+              //check article contains the correct properties
+              expect(article).toMatchObject({
+                comment_count: expect.any(String),
+              });
+            });
+        });
+      });
       describe("PATCH /api/articles/:article_id", () => {
         test("200; Increment votes and responds with updated article", () => {
           return request(app)
