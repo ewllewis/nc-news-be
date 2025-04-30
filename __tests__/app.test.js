@@ -115,6 +115,28 @@ describe("/api", () => {
             });
         });
       });
+      describe("GET /api/articles (topic query)", () => {
+        test("200; Resopnds with articles filtered by topic", () => {
+          return request(app)
+            .get("/api/articles?topic=cats")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              articles.forEach((article) => {
+                expect(article).toMatchObject({
+                  topic: "cats",
+                });
+              });
+            });
+        });
+        test("404; Resopnds with 'No articles found for that query' when topic argument doesn't existing in database", () => {
+          return request(app)
+            .get("/api/articles?topic=banana")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("No articles found for that query");
+            });
+        });
+      });
     });
     describe("/:article_id", () => {
       describe("GET /api/articles/:article_id", () => {
