@@ -13,7 +13,24 @@ async function selectArticleById(articleId) {
   return rows[0];
 }
 
-async function selectArticles() {
+async function selectArticles(sortBy = "created_at", order = "desc") {
+  const allowedSorts = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+  ];
+  const allowedOrder = ["asc", "desc"];
+
+  if (
+    !allowedSorts.includes(sortBy) ||
+    !allowedOrder.includes(order.toLowerCase())
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid input" });
+  }
+
   const { rows } = await db.query(
     `SELECT
       articles.author,
@@ -31,7 +48,7 @@ async function selectArticles() {
     GROUP BY
       articles.article_id
     ORDER BY
-      articles.created_at DESC`
+      articles.${sortBy} ${order.toLowerCase()}`
   );
   return rows;
 }
