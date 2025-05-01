@@ -15,7 +15,37 @@ app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     return res.status(400).send({ msg: "Invalid ID format" });
   } else if (err.code === "23503") {
-    res.status(404).send({ msg: "User or article not found" });
+    const match = err.detail?.match(/\(([^)]+)\)=\(([^)]+)\)/);
+
+    if (match) {
+      const [, column, value] = match;
+
+      let message;
+      let statusCode;
+      switch (column) {
+        case "author":
+          message = `User '${value}' does not exist`;
+          statusCode = 404;
+          break;
+        case "topic":
+          message = `Topic '${value}' does not exist`;
+          statusCode = 404;
+          break;
+        case "article_id":
+          message = `Article with ID '${value}' not found`;
+          statusCode = 404;
+          break;
+        default:
+          message = `Invalid input: ${column} '${value}' does not exist`;
+          statusCode = 400;
+      }
+
+      res.status(statusCode).send({ msg: message });
+    } else {
+      res
+        .status(400)
+        .send({ msg: "Invalid input: related resource not found" });
+    }
   }
   next(err);
 });
