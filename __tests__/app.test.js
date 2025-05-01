@@ -95,7 +95,7 @@ describe("/api", () => {
             .get("/api/articles?sort_by=author&order=asc")
             .expect(200)
             .then(({ body: { articles } }) => {
-              expect(articles).toBeSortedBy("author", { ascending: true });
+              expect(articles).toBeSortedBy("author", { descending: false });
             });
         });
         test("400; Resopnds with 'Invalid input when sort_by argument is invalid", () => {
@@ -415,6 +415,29 @@ describe("/api", () => {
                 avatar_url: expect.any(String),
               });
             });
+          });
+      });
+    });
+    describe("GET /api/users/:username", () => {
+      test("200; Responds with user of given username", () => {
+        return request(app)
+          .get("/api/users/butter_bridge")
+          .expect(200)
+          .then(({ body: { user } }) => {
+            //check user object contains the correct properties
+            expect(user).toMatchObject({
+              username: "butter_bridge",
+              name: expect.any(String),
+              avatar_url: expect.any(String),
+            });
+          });
+      });
+      test("404; Responds 'User not found' when user doesn't exist in database", () => {
+        return request(app)
+          .get("/api/users/banana")
+          .expect(404)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("User not found");
           });
       });
     });
