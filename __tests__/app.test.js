@@ -137,6 +137,78 @@ describe("/api", () => {
             });
         });
       });
+      describe("POST /api/articles", () => {
+        test("200; Responds with newly added article with additional properties", () => {
+          return request(app)
+            .post("/api/articles")
+            .send({
+              author: "butter_bridge",
+              title: "test title",
+              body: "test body",
+              topic: "cats",
+              article_img_url: "",
+            })
+            .expect(200)
+            .then(({ body: { newArticle: article } }) => {
+              //check returned article has the correct properties
+              expect(article).toMatchObject({
+                author: "butter_bridge",
+                title: "test title",
+                body: "test body",
+                article_id: expect.any(Number),
+                topic: "cats",
+                created_at: expect.any(String),
+                votes: 0,
+                article_img_url: "",
+                comment_count: expect.any(String),
+              });
+            });
+        });
+        test("400; Responds with 'Article is missing properties' when passed an object missing required properties", () => {
+          return request(app)
+            .post("/api/articles")
+            .send({
+              title: "test title",
+              body: "test body",
+              topic: "cats",
+              article_img_url: "",
+            })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Article is missing properties");
+            });
+        });
+        test("404; Responds with 'User does not exist' when author doesn't exist in database", () => {
+          return request(app)
+            .post("/api/articles")
+            .send({
+              author: "banana",
+              title: "test title",
+              body: "test body",
+              topic: "cats",
+              article_img_url: "",
+            })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("User 'banana' does not exist");
+            });
+        });
+        test("404; Responds with 'Topic does not exist' when topic doesn't exist in database", () => {
+          return request(app)
+            .post("/api/articles")
+            .send({
+              author: "butter_bridge",
+              title: "test title",
+              body: "test body",
+              topic: "bananas",
+              article_img_url: "",
+            })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Topic 'bananas' does not exist");
+            });
+        });
+      });
     });
     describe("/:article_id", () => {
       describe("GET /api/articles/:article_id", () => {
@@ -292,7 +364,7 @@ describe("/api", () => {
               expect(msg).toBe("Invalid ID format");
             });
         });
-        test("404; Responds 'User or article not found' when article doesn't exisit in the database", () => {
+        test("404; Responds 'Article with ID not found' when article doesn't exisit in the database", () => {
           return request(app)
             .post("/api/articles/100/comments")
             .send({
@@ -301,10 +373,10 @@ describe("/api", () => {
             })
             .expect(404)
             .then(({ body: { msg } }) => {
-              expect(msg).toBe("User or article not found");
+              expect(msg).toBe("Article with ID '100' not found");
             });
         });
-        test("404; Responds 'User or article not found' when user doesn't exisit in the database", () => {
+        test("404; Responds 'User does not exist' when user doesn't exisit in the database", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -313,7 +385,7 @@ describe("/api", () => {
             })
             .expect(404)
             .then(({ body: { msg } }) => {
-              expect(msg).toBe("User or article not found");
+              expect(msg).toBe("User 'banana' does not exist");
             });
         });
         test("400; Responds 'Comment body empty' when body is empty", () => {

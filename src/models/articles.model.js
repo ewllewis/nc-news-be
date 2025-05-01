@@ -160,10 +160,48 @@ async function updateVotesOnArticleByArticleId(article_id, inc_votes) {
   return updatedArticle.rows[0];
 }
 
+async function insertArticle(author, title, body, topic, article_img_url = "") {
+  const insertResult = await db.query(
+    `INSERT INTO
+        articles 
+        (author,title,body,topic,article_img_url)
+      VALUES 
+        ($1,$2,$3,$4,$5) 
+      RETURNING *`,
+    [author, title, body, topic, article_img_url]
+  );
+  const insertedArticle = insertResult.rows[0];
+
+  const { rows } = await db.query(
+    `
+    SELECT
+      articles.author,
+      articles.title,
+      articles.body,
+      articles.article_id,
+      articles.topic,
+      articles.created_at,
+      articles.votes,
+      articles.article_img_url,
+      COALESCE(COUNT(comments.comment_id), 0) AS comment_count
+    FROM 
+      articles
+    LEFT JOIN
+      comments ON articles.article_id = comments.article_id
+    WHERE
+      articles.article_id = $1
+    GROUP BY
+      articles.article_id`,
+    [insertedArticle.article_id]
+  );
+  return rows[0];
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
   selectCommentsByArticleId,
   insertCommentByArticleId,
   updateVotesOnArticleByArticleId,
+  insertArticle,
 };
