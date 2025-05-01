@@ -374,25 +374,94 @@ describe("/api", () => {
     });
   });
   describe("/comments", () => {
-    describe("DELETE /api/comments/:comment_id", () => {
-      test("200; deletes comment, responds with no content", () => {
-        return request(app).delete("/api/comments/1").expect(204);
+    describe("/:comment_id", () => {
+      describe("DELETE /api/comments/:comment_id", () => {
+        test("200; deletes comment, responds with no content", () => {
+          return request(app).delete("/api/comments/1").expect(204);
+        });
+        test("404; Responds 'Comment not found' when comment doesn't exist in the database", () => {
+          return request(app)
+            .delete("/api/comments/100")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Comment not found");
+            });
+        });
+        test("400; Responds 'Invalid ID format' when comment ID is invalid", () => {
+          return request(app)
+            .delete("/api/comments/banana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid ID format");
+            });
+        });
       });
-      test("404; Responds 'Comment not found' when comment doesn't exist in the database", () => {
-        return request(app)
-          .delete("/api/comments/100")
-          .expect(404)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe("Comment not found");
-          });
-      });
-      test("400; Responds 'Invalid ID format' when comment ID is invalid", () => {
-        return request(app)
-          .delete("/api/comments/banana")
-          .expect(400)
-          .then(({ body: { msg } }) => {
-            expect(msg).toBe("Invalid ID format");
-          });
+      describe("PATCH /api/comments/:comment_id", () => {
+        test("200; increments votes on comment by comment ID", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: 1 })
+            .expect(200)
+            .then(({ body: { updatedComment: comment } }) => {
+              //check updated comment contains correct properties
+              expect(comment).toMatchObject({
+                //check comment with given ID was updated
+                comment_id: 1,
+                article_id: expect.any(Number),
+                body: expect.any(String),
+                //check votes were incremented with known value
+                votes: 17,
+                author: expect.any(String),
+                created_at: expect.any(String),
+              });
+            });
+        });
+        test("200; decrements votes on comment by comment ID", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: -1 })
+            .expect(200)
+            .then(({ body: { updatedComment: comment } }) => {
+              //check updated comment contains correct properties
+              expect(comment).toMatchObject({
+                //check comment with given ID was updated
+                comment_id: 1,
+                article_id: expect.any(Number),
+                body: expect.any(String),
+                //check votes were decremented with known value
+                votes: 15,
+                author: expect.any(String),
+                created_at: expect.any(String),
+              });
+            });
+        });
+        test("404; responds 'Comment not found' when comment doesn't exist in database", () => {
+          return request(app)
+            .patch("/api/comments/100")
+            .send({ inc_votes: 1 })
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Comment not found");
+            });
+        });
+        test("400; responds 'Invalid ID format' when comment ID is invalid", () => {
+          return request(app)
+            .patch("/api/comments/banana")
+            .send({ inc_votes: 1 })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid ID format");
+            });
+        });
+        test("400; Responds 'Invalid votes format' when vote format is incorrect", () => {
+          return request(app)
+            .patch("/api/comments/1")
+            .send({ inc_votes: "banana" })
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid votes format");
+            });
+        });
       });
     });
   });
