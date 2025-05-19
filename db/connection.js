@@ -2,7 +2,6 @@ const { Pool } = require("pg");
 const dotenv = require("dotenv");
 
 dotenv.config({ path: "./.env.production" }); // Ensure the production .env file is loaded
-console.log("DATABASE_URL:", process.env.DATABASE_URL); // Log DATABASE_URL to verify it's loaded correctly
 
 const ENV = process.env.NODE_ENV || "development";
 const config = {};

@@ -126,5 +126,28 @@
         }
       ]
     }
+  },
+  "GET /api/users/:username": {
+    "description": "serves a user object by given username",
+    "exampleResponse": {
+      "user": {
+        "username": "butter_bridge",
+        "name": "jonny",
+        "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+      }
+    }
+  },
+  "PATCH /api/comments/:comment_id": {
+    "description": "serves an updated comment object by given comment_id",
+    "exampleResponse": {
+      "updateComment": {
+        "comment_id": 1,
+        "article_id": 9,
+        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        "votes": 15,
+        "author": "butter_bridge",
+        "created_at": "2020-04-06T12:17:00.000Z"
+      }
+    }
   }
 }

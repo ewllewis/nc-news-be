@@ -5,6 +5,7 @@ const {
   selectCommentsByArticleId,
   insertCommentByArticleId,
   updateVotesOnArticleByArticleId,
+  insertArticle,
 } = require("../models/articles.model");
 
 async function getArticleById(req, res, next) {
@@ -94,10 +95,33 @@ async function patchArticleByArticleId(req, res, next) {
   }
 }
 
+async function postArticle(req, res, next) {
+  const { author, title, body, topic, article_img_url } = req.body;
+
+  if (!author || !title || !body || !topic) {
+    return res.status(400).send({ msg: "Article is missing properties" });
+  }
+
+  try {
+    const newArticle = await insertArticle(
+      author,
+      title,
+      body,
+      topic,
+      article_img_url
+    );
+    res.status(200).send({ newArticle });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+}
+
 module.exports = {
   getArticleById,
   getArticles,
   getCommentsByArticleId,
   postCommentByArticleId,
   patchArticleByArticleId,
+  postArticle,
 };
