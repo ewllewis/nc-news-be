@@ -1,15 +1,16 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
+const apiRouter = require("./routers/api.router");
+
+app.use(cors());
+app.use(express.json());
+
+app.use("/api", apiRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the API!");
 });
-
-const apiRouter = require("./routers/api.router");
-
-app.use(express.json());
-
-app.use("/api", apiRouter);
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
