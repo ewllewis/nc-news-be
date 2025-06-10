@@ -9,6 +9,21 @@ async function selectTopics() {
   return rows;
 }
 
+async function insertTopic(slug, description, img_url = "") {
+  const insertResult = await db.query(
+    `INSERT INTO
+        topics 
+        (slug, description, img_url)
+      VALUES 
+        ($1,$2, $3) 
+      RETURNING *`,
+    [slug, description, img_url]
+  );
+
+  return insertResult.rows[0];
+}
+
 module.exports = {
   selectTopics,
+  insertTopic,
 };
