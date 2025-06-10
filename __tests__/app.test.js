@@ -47,6 +47,36 @@ describe("/api", () => {
           });
       });
     });
+    describe("POST /api/topics", () => {
+      test("201; Responds with posted topic", () => {
+        return request(app)
+          .post("/api/topics")
+          .send({
+            slug: "bananas",
+            description: "This is a very interesting topic",
+          })
+          .expect(201)
+          .then(({ body: { topic } }) => {
+            //check response matches post input data and has correct properties
+            expect(topic).toMatchObject({
+              slug: "bananas",
+              description: "This is a very interesting topic",
+              img_url: "",
+            });
+          });
+      });
+      test("400; Responds 'Topic is missing properties' when properties are missing", () => {
+        return request(app)
+          .post("/api/topics")
+          .send({
+            slug: "bananas",
+          })
+          .expect(400)
+          .then(({ body: { msg } }) => {
+            expect(msg).toBe("Topic is missing properties");
+          });
+      });
+    });
   });
   describe("/articles", () => {
     describe("/articles", () => {

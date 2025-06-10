@@ -14,6 +14,23 @@
       ]
     }
   },
+  "POST /api/topics": {
+    "description": "creates a new topic and serves the new topic",
+    "queries": [],
+    "exampleRequest": {
+      "slug": "football",
+      "description": "Footie!"
+    },
+    "exampleResponse": {
+      "topics": [
+        {
+          "slug": "football",
+          "description": "Footie!",
+          "img_url": ""
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": ["sort_by", "order", "topic", "limit", "p"],
