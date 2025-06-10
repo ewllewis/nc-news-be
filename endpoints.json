@@ -6,11 +6,36 @@
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        {
+          "slug": "football",
+          "description": "Footie!"
+        }
+      ]
+    }
+  },
+  "GET /api/articles": {
+    "description": "serves an array of all articles",
+    "queries": ["sort_by", "order", "topic", "limit", "p"],
+    "exampleResponse": {
+      "articles": [
+        {
+          "article_id": 1,
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          "comment_count": "6"
+        }
+      ],
+      "total_count": 13
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves a single article given an article ID",
+    "description": "serves an article object for the given article_id",
+    "queries": [],
     "exampleResponse": {
       "article": {
         "article_id": 1,
@@ -18,135 +43,133 @@
         "topic": "mitch",
         "author": "butter_bridge",
         "body": "I find this existence challenging",
-        "created_at": "2018-05-30T15:59:13.341Z",
+        "created_at": "2020-07-09T20:11:00.000Z",
         "votes": 100,
         "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         "comment_count": "11"
       }
     }
   },
-  "GET /api/articles": {
-    "description": "serves an array of all articles",
+  "POST /api/articles": {
+    "description": "creates a new article and serves the created article",
+    "queries": [],
+    "exampleRequest": {
+      "author": "butter_bridge",
+      "title": "test title",
+      "body": "test body",
+      "topic": "cats",
+      "article_img_url": ""
+    },
     "exampleResponse": {
-      "articles": [
-        {
-          "author": "icellusedkars",
-          "title": "Eight pug gifs that remind me of mitch",
-          "article_id": 3,
-          "topic": "mitch",
-          "created_at": "2020-11-03T09:12:00.000Z",
-          "votes": 0,
-          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          "comment_count": 2
-        }
-      ]
+      "newArticle": {
+        "article_id": 14,
+        "title": "test title",
+        "topic": "cats",
+        "author": "butter_bridge",
+        "body": "test body",
+        "created_at": "2023-01-01T00:00:00.000Z",
+        "votes": 0,
+        "article_img_url": "",
+        "comment_count": "0"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "updates the votes on an article by article_id and serves the updated article",
+    "queries": [],
+    "exampleRequest": {
+      "inc_votes": 1
+    },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "created_at": "2020-07-09T20:11:00.000Z",
+        "votes": 101,
+        "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+      }
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "serves an array of all comments for given article ID",
+    "description": "serves an array of comments for the given article_id",
+    "queries": ["limit", "p"],
     "exampleResponse": {
       "comments": [
         {
-          "comment_id": 5,
-          "votes": 0,
-          "created_at": "2020-11-03T21:00:00.000Z",
-          "author": "icellusedkars",
-          "body": "I hate streaming noses",
-          "article_id": 1
+          "comment_id": 2,
+          "article_id": 1,
+          "author": "butter_bridge",
+          "body": "The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.",
+          "created_at": "2020-10-31T03:03:00.000Z",
+          "votes": 14
         }
       ]
     }
   },
   "POST /api/articles/:article_id/comments": {
-    "description": "inserts comment to the database and serves the posted comment",
+    "description": "creates a new comment for the given article_id and serves the created comment",
+    "queries": [],
+    "exampleRequest": {
+      "username": "butter_bridge",
+      "body": "what does this mean for bananas?"
+    },
     "exampleResponse": {
-      "comment": [
-        {
-          "comment_id": 19,
-          "article_id": 1,
-          "body": "what does this mean for bananas?",
-          "votes": 0,
-          "author": "butter_bridge",
-          "created_at": "2025-04-29T08:57:35.379Z"
-        }
-      ]
-    }
-  },
-  "PATCH /api/articles/:article_id/comments": {
-    "description": "updates number of votes of an article",
-    "exampleResponse": {
-      "article": [
-        {
-          "author": "icellusedkars",
-          "title": "Eight pug gifs that remind me of mitch",
-          "article_id": 3,
-          "topic": "mitch",
-          "created_at": "2020-11-03T09:12:00.000Z",
-          "votes": 101,
-          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-        }
-      ]
+      "comment": {
+        "comment_id": 19,
+        "article_id": 1,
+        "author": "butter_bridge",
+        "body": "what does this mean for bananas?",
+        "created_at": "2023-01-01T00:00:00.000Z",
+        "votes": 0
+      }
     }
   },
   "DELETE /api/comments/:comment_id": {
-    "description": "deletes comment from database by id",
-    "status": "204",
-    "exampleResponse": "no content"
+    "description": "deletes the comment with the given comment_id",
+    "queries": [],
+    "exampleResponse": {}
   },
-  "GET /api/articles?sort_by=author&order=desc": {
-    "description": "serves an array of all articles sorted by given queries",
+  "PATCH /api/comments/:comment_id": {
+    "description": "updates the votes on a comment by comment_id and serves the updated comment",
+    "queries": [],
+    "exampleRequest": {
+      "inc_votes": 1
+    },
     "exampleResponse": {
-      "articles": [
-        {
-          "author": "icellusedkars",
-          "title": "Eight pug gifs that remind me of mitch",
-          "article_id": 3,
-          "topic": "mitch",
-          "created_at": "2020-11-03T09:12:00.000Z",
-          "votes": 0,
-          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          "comment_count": 2
-        }
-      ]
+      "updatedComment": {
+        "comment_id": 1,
+        "article_id": 9,
+        "author": "butter_bridge",
+        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+        "created_at": "2020-04-06T12:17:00.000Z",
+        "votes": 17
+      }
     }
   },
-  "GET /api/articles?topic=mitch": {
-    "description": "serves an array of all articles filtered by topic",
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
     "exampleResponse": {
-      "articles": [
+      "users": [
         {
-          "author": "icellusedkars",
-          "title": "Eight pug gifs that remind me of mitch",
-          "article_id": 3,
-          "topic": "mitch",
-          "created_at": "2020-11-03T09:12:00.000Z",
-          "votes": 0,
-          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-          "comment_count": 2
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
         }
       ]
     }
   },
   "GET /api/users/:username": {
-    "description": "serves a user object by given username",
+    "description": "serves a user object for the given username",
+    "queries": [],
     "exampleResponse": {
       "user": {
         "username": "butter_bridge",
         "name": "jonny",
         "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
-      }
-    }
-  },
-  "PATCH /api/comments/:comment_id": {
-    "description": "serves an updated comment object by given comment_id",
-    "exampleResponse": {
-      "updateComment": {
-        "comment_id": 1,
-        "article_id": 9,
-        "body": "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
-        "votes": 15,
-        "author": "butter_bridge",
-        "created_at": "2020-04-06T12:17:00.000Z"
       }
     }
   }

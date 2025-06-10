@@ -107,7 +107,16 @@ async function selectArticles(
   return { articles: paginatedRows, total_count };
 }
 
-async function selectCommentsByArticleId(articleId) {
+async function selectCommentsByArticleId(articleId, limit = 10, p = 1) {
+  if (
+    isNaN(Number(limit)) ||
+    Number(limit) <= 0 ||
+    isNaN(Number(p)) ||
+    Number(p) <= 0
+  ) {
+    return Promise.reject({ status: 400, msg: "Invalid input" });
+  }
+
   const { rows } = await db.query(
     `SELECT
       comments.comment_id,
@@ -124,7 +133,13 @@ async function selectCommentsByArticleId(articleId) {
       comments.created_at DESC`,
     [articleId]
   );
-  return rows;
+
+  const startingIndex = Number(limit) * (Number(p) - 1);
+  const endingIndex = startingIndex + Number(limit);
+
+  const paginatedRows = rows.slice(startingIndex, endingIndex);
+
+  return paginatedRows;
 }
 
 async function insertCommentByArticleId(
