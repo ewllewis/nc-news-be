@@ -455,8 +455,6 @@ describe("/api", () => {
             .then(({ body: { comments } }) => {
               //check comments is an array
               expect(Array.isArray(comments)).toBe(true);
-              //check size of array with known number of comment objects
-              expect(comments).toHaveLength(11);
 
               comments.forEach((comment) => {
                 //check each comment object contains the correct properties
@@ -486,6 +484,53 @@ describe("/api", () => {
             .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).toBe("Comments not found");
+            });
+        });
+      });
+      describe("GET /api/articles/:article_id/comments (pagination)", () => {
+        test("200; Responds with 10 comments from a given article ID by default", () => {
+          return request(app)
+            .get("/api/articles/1/comments")
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(comments).toHaveLength(10);
+            });
+        });
+        let commentsPage1 = [];
+        test("200; Responds with 5 comments from a given article ID when passed a limit of 5", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=5")
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(comments).toHaveLength(5);
+              commentsPage1 = [...comments];
+            });
+        });
+        let commentsPage2 = [];
+        test("200; Responds with different 5 comments from a given article ID when passed a limit of 5 and p of 2", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=5&p=2")
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(comments).toHaveLength(5);
+              commentsPage2 = [...comments];
+              expect(commentsPage1).not.toEqual(commentsPage2);
+            });
+        });
+        test("400; Responds 'Invalid input' when limit is not a number", () => {
+          return request(app)
+            .get("/api/articles/1/comments?limit=banana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid input");
+            });
+        });
+        test("400; Responds 'Invalid input' when p is not a number", () => {
+          return request(app)
+            .get("/api/articles/1/comments?p=banana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid input");
             });
         });
       });

@@ -42,8 +42,9 @@ async function getArticles(req, res, next) {
 
 async function getCommentsByArticleId(req, res, next) {
   const { article_id } = req.params;
+  const { limit, p } = req.query;
   try {
-    const comments = await selectCommentsByArticleId(article_id);
+    const comments = await selectCommentsByArticleId(article_id, limit, p);
 
     //check if comments exists in database
     if (comments.length === 0) {
