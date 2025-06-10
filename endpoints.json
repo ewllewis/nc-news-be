@@ -144,6 +144,11 @@
       }
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "deletes the article with the given article_id",
+    "queries": [],
+    "exampleResponse": {}
+  },
   "DELETE /api/comments/:comment_id": {
     "description": "deletes the comment with the given comment_id",
     "queries": [],

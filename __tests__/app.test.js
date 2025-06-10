@@ -564,6 +564,27 @@ describe("/api", () => {
             });
         });
       });
+      describe("DELETE /api/articles/:article_id/", () => {
+        test("204; deletes article, responds with no content", () => {
+          return request(app).delete("/api/articles/2").expect(204);
+        });
+        test("404; Responds 'Article not found' when article doesn't exist in the database", () => {
+          return request(app)
+            .delete("/api/articles/100")
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Article not found");
+            });
+        });
+        test("400; Responds 'Invalid ID format' when comment ID is invalid", () => {
+          return request(app)
+            .delete("/api/articles/banana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid ID format");
+            });
+        });
+      });
     });
   });
   describe("/comments", () => {

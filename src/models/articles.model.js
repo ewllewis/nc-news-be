@@ -227,6 +227,23 @@ async function insertArticle(author, title, body, topic, article_img_url = "") {
   return rows[0];
 }
 
+async function removeArticle(article_id) {
+  const { rows } = await db.query(
+    `
+    DELETE FROM 
+      articles 
+    WHERE 
+      article_id = $1
+    RETURNING *`,
+    [article_id]
+  );
+  if (rows.length === 0) {
+    return Promise.reject({ status: 404, msg: "Article not found" });
+  }
+
+  return rows[0];
+}
+
 module.exports = {
   selectArticleById,
   selectArticles,
@@ -234,4 +251,5 @@ module.exports = {
   insertCommentByArticleId,
   updateVotesOnArticleByArticleId,
   insertArticle,
+  removeArticle,
 };
