@@ -6,6 +6,7 @@ const {
   insertCommentByArticleId,
   updateVotesOnArticleByArticleId,
   insertArticle,
+  removeArticle,
 } = require("../models/articles.model");
 
 async function getArticleById(req, res, next) {
@@ -123,6 +124,17 @@ async function postArticle(req, res, next) {
   }
 }
 
+async function deleteArticle(req, res, next) {
+  const { article_id } = req.params;
+
+  try {
+    const deletedArticle = await removeArticle(article_id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getArticleById,
   getArticles,
@@ -130,4 +142,5 @@ module.exports = {
   postCommentByArticleId,
   patchArticleByArticleId,
   postArticle,
+  deleteArticle,
 };
