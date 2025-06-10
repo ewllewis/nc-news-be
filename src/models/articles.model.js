@@ -32,7 +32,13 @@ async function selectArticleById(articleId) {
   return rows[0];
 }
 
-async function selectArticles(sortBy = "created_at", order = "desc", topic) {
+async function selectArticles(
+  sortBy = "created_at",
+  order = "desc",
+  topic,
+  limit = 10,
+  p = 1
+) {
   const allowedSorts = [
     "author",
     "title",
@@ -45,7 +51,11 @@ async function selectArticles(sortBy = "created_at", order = "desc", topic) {
 
   if (
     !allowedSorts.includes(sortBy) ||
-    !allowedOrder.includes(order.toLowerCase())
+    !allowedOrder.includes(order.toLowerCase()) ||
+    isNaN(Number(limit)) ||
+    Number(limit) <= 0 ||
+    isNaN(Number(p)) ||
+    Number(p) <= 0
   ) {
     return Promise.reject({ status: 400, msg: "Invalid input" });
   }
@@ -88,8 +98,13 @@ async function selectArticles(sortBy = "created_at", order = "desc", topic) {
       msg: "No articles found for that query",
     });
   }
+  const startingIndex = Number(limit) * (Number(p) - 1);
+  const endingIndex = startingIndex + Number(limit);
 
-  return rows;
+  const paginatedRows = rows.slice(startingIndex, endingIndex);
+  const total_count = rows.length;
+
+  return { articles: paginatedRows, total_count };
 }
 
 async function selectCommentsByArticleId(articleId) {

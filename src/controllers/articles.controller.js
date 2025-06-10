@@ -25,10 +25,16 @@ async function getArticleById(req, res, next) {
 }
 
 async function getArticles(req, res, next) {
-  const { sort_by, order, topic } = req.query;
+  const { sort_by, order, topic, limit, p } = req.query;
   try {
-    const articles = await selectArticles(sort_by, order, topic);
-    res.status(200).send({ articles });
+    const { articles, total_count } = await selectArticles(
+      sort_by,
+      order,
+      topic,
+      limit,
+      p
+    );
+    res.status(200).send({ articles, total_count });
   } catch (err) {
     next(err);
   }
@@ -112,7 +118,6 @@ async function postArticle(req, res, next) {
     );
     res.status(200).send({ newArticle });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 }
