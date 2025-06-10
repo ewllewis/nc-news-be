@@ -58,8 +58,6 @@ describe("/api", () => {
             .then(({ body: { articles } }) => {
               //check articles is an array
               expect(Array.isArray(articles)).toBe(true);
-              //check size of array with known number of article objects
-              expect(articles).toHaveLength(13);
 
               articles.forEach((article) => {
                 //check each article object contains the correct properties
@@ -134,6 +132,54 @@ describe("/api", () => {
             .expect(404)
             .then(({ body: { msg } }) => {
               expect(msg).toBe("No articles found for that query");
+            });
+        });
+      });
+      describe("GET /api/articles (pagination)", () => {
+        test("200; Responds with 10 articles by default and total_count property", () => {
+          return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({ body: { articles, total_count } }) => {
+              expect(articles.length).toBe(10);
+              expect(total_count).toBe(13);
+            });
+        });
+        let articlesPage1 = [];
+        test("200; Responds with 5 articles when passed a limit of 5", () => {
+          return request(app)
+            .get("/api/articles?limit=5")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(5);
+              articlesPage1 = [...articles];
+            });
+        });
+        let articlesPage2 = [];
+        test("200; Responds with a different page of 5 articles when passed p as 2", () => {
+          return request(app)
+            .get("/api/articles?limit=5&p=2")
+            .expect(200)
+            .then(({ body: { articles } }) => {
+              expect(articles.length).toBe(5);
+              articlesPage2 = [...articles];
+              expect(articlesPage1).not.toEqual(articlesPage2);
+            });
+        });
+        test("400; Resopnds with 'Invalid input when limit argument is invalid", () => {
+          return request(app)
+            .get("/api/articles?limit=banana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid input");
+            });
+        });
+        test("400; Resopnds with 'Invalid input when p argument is invalid", () => {
+          return request(app)
+            .get("/api/articles?p=banana")
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Invalid input");
             });
         });
       });
