@@ -47,11 +47,6 @@ async function getCommentsByArticleId(req, res, next) {
   try {
     const comments = await selectCommentsByArticleId(article_id, limit, p);
 
-    //check if comments exists in database
-    if (comments.length === 0) {
-      return res.status(404).json({ msg: "Comments not found" });
-    }
-
     res.status(200).send({ comments });
   } catch (err) {
     next(err);

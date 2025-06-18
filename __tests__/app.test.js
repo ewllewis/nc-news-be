@@ -508,12 +508,12 @@ describe("/api", () => {
               expect(msg).toBe("Invalid ID format");
             });
         });
-        test("404; Responds 'Comments not found' when article_id does not exist in the database", () => {
+        test("200; Responds 'with empty array when no comments are found in the database", () => {
           return request(app)
             .get("/api/articles/100/comments")
-            .expect(404)
-            .then(({ body: { msg } }) => {
-              expect(msg).toBe("Comments not found");
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(comments.length).toBe(0);
             });
         });
       });
